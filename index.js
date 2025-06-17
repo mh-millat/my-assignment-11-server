@@ -106,3 +106,34 @@ async function run() {
         res.status(500).send({ success: false, message: "Failed to fetch public expiring foods" });
       }
     });
+
+    //  Get food details by ID
+    app.get('/foods/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({ success: false, message: "Invalid food ID" });
+        }
+
+        const food = await foodCollection.findOne({ _id: new ObjectId(id) });
+        if (!food) {
+          return res.status(404).send({ success: false, message: "Food not found" });
+        }
+
+        res.send(food);
+      } catch (error) {
+        console.error('Error fetching food details:', error);
+        res.status(500).send({ success: false, message: "Failed to fetch food details" });
+      }
+    });
+
+    //  Public route: Get all fridge items
+    app.get('/fridge', async (req, res) => {
+      try {
+        const fridgeFoods = await foodCollection.find({ storage: "Fridge" }).toArray();
+        res.send(fridgeFoods);
+      } catch (error) {
+        console.error('Error fetching fridge foods:', error);
+        res.status(500).send({ success: false, message: "Failed to fetch fridge foods" });
+      }
+    });
