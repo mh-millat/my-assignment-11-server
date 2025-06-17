@@ -87,3 +87,22 @@ async function run() {
         res.status(500).send({ success: false, message: "Failed to fetch expired foods" });
       }
     });
+
+    
+    //  Public route: Get all foods expiring within 5 days (including today)
+    app.get('/foods/all', async (req, res) => {
+      try {
+        const now = new Date();
+        const fiveDaysLater = new Date();
+        fiveDaysLater.setDate(now.getDate() + 5);
+
+        const filtered = await foodCollection.find({
+          expiryDate: { $lte: fiveDaysLater }
+        }).toArray();
+
+        res.send(filtered);
+      } catch (error) {
+        console.error("Error fetching all foods:", error);
+        res.status(500).send({ success: false, message: "Failed to fetch public expiring foods" });
+      }
+    });
