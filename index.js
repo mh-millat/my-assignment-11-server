@@ -71,3 +71,19 @@ async function run() {
         res.status(500).send({ success: false, message: "Failed to fetch foods" });
       }
     });
+
+    //  Public route: Get all expired foods (before today)
+    app.get('/foods/expired-public', async (req, res) => {
+      try {
+        const now = new Date();
+
+        const expiredItems = await foodCollection.find({
+          expiryDate: { $lt: now }
+        }).toArray();
+
+        res.send(expiredItems);
+      } catch (error) {
+        console.error("Error fetching public expired foods:", error);
+        res.status(500).send({ success: false, message: "Failed to fetch expired foods" });
+      }
+    });
