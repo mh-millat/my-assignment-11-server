@@ -53,3 +53,21 @@ async function run() {
         res.status(500).send({ success: false, message: "Failed to add food" });
       }
     });
+
+    
+
+    //  Get all foods for specific user
+    app.get('/foods', async (req, res) => {
+      try {
+        const email = req.query.email;
+        if (!email) {
+          return res.status(400).send({ success: false, message: "Email query parameter required" });
+        }
+
+        const foods = await foodCollection.find({ userEmail: email }).toArray();
+        res.send(foods);
+      } catch (error) {
+        console.error('Error fetching foods:', error);
+        res.status(500).send({ success: false, message: "Failed to fetch foods" });
+      }
+    });
