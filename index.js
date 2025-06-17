@@ -54,7 +54,7 @@ async function run() {
       }
     });
 
-    
+
 
 
     app.get('/foods', async (req, res) => {
@@ -88,7 +88,44 @@ async function run() {
       }
     });
 
-    
+
+
+
+     // New route to add a note to a specific food item
+    app.post('/foods/:id/notes', async (req, res) => {
+      const { id } = req.params;
+      const { text, postedAt, userEmail, userName } = req.body;
+
+      // Validate the input
+      if (!text || !postedAt || !userEmail || !userName) {
+        return res.status(400).json({ success: false, message: "All fields are required" });
+      }
+
+      // Find the food item by ID
+      const food = await foodCollection.findOne({ _id: new ObjectId(id) });
+      if (!food) {
+        return res.status(404).json({ success: false, message: "Food item not found" });
+      }
+
+      // Add the note to the food item
+      const newNote = { text, postedAt, userEmail, userName };
+      const updatedFood = await foodCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $push: { notes: newNote } }
+      );
+
+      if (updatedFood.modifiedCount > 0) {
+        res.status(201).json({ success: true, note: newNote });
+      } else {
+        res.status(500).json({ success: false, message: "Failed to add note" });
+      }
+    });
+
+
+
+
+
+
 
     app.get('/foods/all', async (req, res) => {
       try {
@@ -138,7 +175,7 @@ async function run() {
       }
     });
 
-    
+
     app.delete('/foods/:id', async (req, res) => {
       try {
         const id = req.params.id;
@@ -164,7 +201,7 @@ async function run() {
         const topFoods = await foodCollection
           .find({})
           .sort({ quantity: -1 })
-          .limit(10) 
+          .limit(10)
           .toArray();
 
         res.json(topFoods);
