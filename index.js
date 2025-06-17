@@ -137,3 +137,29 @@ async function run() {
         res.status(500).send({ success: false, message: "Failed to fetch fridge foods" });
       }
     });
+
+    
+    //  Delete food by ID
+    app.delete('/foods/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send({ success: false, message: "Invalid ID" });
+        }
+
+        const result = await foodCollection.deleteOne({ _id: new ObjectId(id) });
+        if (result.deletedCount > 0) {
+          res.send({ success: true, message: "Food deleted" });
+        } else {
+          res.status(404).send({ success: false, message: "Food not found" });
+        }
+      } catch (error) {
+        console.error('Error deleting food:', error);
+        res.status(500).send({ success: false, message: "Failed to delete food" });
+      }
+    });
+
+
+
+
+
