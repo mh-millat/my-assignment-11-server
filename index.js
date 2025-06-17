@@ -24,3 +24,32 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+
+
+
+async function run() {
+  try {
+    // await client.connect(); // Uncomment this in production if needed
+    console.log(" MongoDB Connected");
+
+    const foodCollection = client.db("foodTrackerDB").collection("foods");
+
+    //  Add new food
+    app.post('/foods', async (req, res) => {
+      try {
+        const food = req.body;
+        if (!food || !food.title || !food.userEmail) {
+          return res.status(400).send({ success: false, message: "Missing required food data or userEmail" });
+        }
+
+        if (food.expiryDate) {
+          food.expiryDate = new Date(food.expiryDate);
+        }
+
+        const result = await foodCollection.insertOne(food);
+        res.status(201).send({ success: true, message: "Food added", insertedId: result.insertedId });
+      } catch (error) {
+        console.error('Error adding food:', error);
+        res.status(500).send({ success: false, message: "Failed to add food" });
+      }
+    });
