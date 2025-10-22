@@ -75,9 +75,6 @@ async function run() {
       }
     });
 
-
-
-
     app.get('/foods', async (req, res) => {
       try {
         const email = req.query.email;
@@ -140,11 +137,6 @@ async function run() {
         res.status(500).json({ success: false, message: "Failed to add note" });
       }
     });
-
-
-
-
-
 
 
     app.get('/foods/all', async (req, res) => {
@@ -295,7 +287,6 @@ app.listen(port, () => {
 
 
 process.on('SIGINT', async () => {
-  // await client.close();
   console.log(' MongoDB connection closed');
   process.exit(0);
 });
